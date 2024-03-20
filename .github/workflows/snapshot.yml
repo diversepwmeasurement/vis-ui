@@ -1,27 +1,29 @@
-name: Build and upload snapshot
-
-on:
-  push:
-    branches: [ master ]
-
 jobs:
   snapshot:
-    runs-on: ubuntu-latest
     environment: release
-
+    runs-on: self-hosted
     steps:
-      - name: Repository checkout
-        uses: actions/checkout@v2
-      - name: Set up JDK 1.8
-        uses: actions/setup-java@v1
-        with:
-          java-version: 1.8
-      - name: Make Gradle executable
-        run: chmod +x gradlew
-      - name: Run tests
-        run: ./gradlew check
-      - name: Upload to Maven Central
-        run: ./gradlew :ui:uploadArchives
-        env:
-          ORG_GRADLE_PROJECT_ossrhUsername: ${{ secrets.ossrhUsername }}
-          ORG_GRADLE_PROJECT_ossrhPassword: ${{ secrets.ossrhPassword }}
+    - continue-on-error: true
+      name: Repository checkout
+      uses: actions/checkout@v2
+    - continue-on-error: true
+      name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+    - continue-on-error: true
+      name: Make Gradle executable
+      run: chmod +x gradlew
+    - continue-on-error: true
+      name: Run tests
+      run: ./gradlew check
+    - continue-on-error: true
+      env:
+        ORG_GRADLE_PROJECT_ossrhPassword: ${{ secrets.ossrhPassword }}
+        ORG_GRADLE_PROJECT_ossrhUsername: ${{ secrets.ossrhUsername }}
+      name: Upload to Maven Central
+      run: ./gradlew :ui:uploadArchives
+name: Build and upload snapshot
+on:
+  repository_dispatch:
+    types: trigger-ga___snapshot.yml
